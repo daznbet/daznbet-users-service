@@ -1,0 +1,13 @@
+user:
+   handler: src/users.handler
+   events:
+     - http:
+         path: '/users'
+         method: get
+
+userCreate:
+   handler: src/userCreate.handler
+   events:
+     - http:
+         path: '/users'
+         method: post
