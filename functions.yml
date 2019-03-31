@@ -4,6 +4,8 @@ user:
      - http:
          path: '/users'
          method: get
+         cors:
+            origin: '*'
 
 userCreate:
    handler: src/userCreate.handler
@@ -11,3 +13,5 @@ userCreate:
      - http:
          path: '/users'
          method: post
+         cors:
+            origin: '*'

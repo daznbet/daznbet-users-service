@@ -9,6 +9,11 @@ provider:
  runtime: nodejs8.10
  region: sa-east-1
  environment: ${self:custom.env}
+ iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
 
 functions: ${file(./functions.yml)}
 

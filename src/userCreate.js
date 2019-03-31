@@ -13,7 +13,7 @@ const response = {
 const createUser = (event) => {
     let body = JSON.parse(event.body);
 
-    if (!!body && 'userName' in body) {
+    if (!!body && 'userName' in body && typeof event.body.userName === 'String') {
         return {
             TableName: process.env.DYNAMO_USER_TABLE,
             Item: {
@@ -28,9 +28,11 @@ const createUser = (event) => {
 
 const putItem = (params) => {
     return new Promise((resolve, reject) => {
-        dbClient.put(params, (err, data) => {
+        dbClient.put(params)
+        .promise()
+        .then((err, data) => {
             if (!!err) {
-                response.statusCode = err.statusCode || 503;
+                response.statusCode = err.statusCode || 500;
                 response.body = JSON.stringify(err.message);
             } else {
                 response.statusCode = 201;
@@ -38,9 +40,13 @@ const putItem = (params) => {
             }
 
             resolve(response);
-        })
-    })
-}
+        }).catch((err) => {
+            response.statusCode = err.statusCode || 503;
+            response.body = JSON.stringify(err.message);
+            resolve(response)
+        });
+    });
+};
 
 module.exports.handler = async(event) => {
     let params = createUser(event);
@@ -48,7 +54,7 @@ module.exports.handler = async(event) => {
     if (params == null) {
         response.statusCode = 401;
         response.body = JSON.stringify('Body does not contain an valid userName');
-        return JSON.stringify(response);
+        return response;
     }
 
     return await putItem(params);

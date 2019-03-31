@@ -16,15 +16,15 @@ module.exports.handler = async(event) => {
     };
 
     return await new Promise((resolve, reject) => {
-        dbClient.scan(params, (err, data) => {
-            if (err) {
-                response.statusCode = err.statusCode || 501;
-                response.body = JSON.stringify(err);
-            } else {
-                response.body = JSON.stringify(data.Items);
-            }
-
+        dbClient.scan(params)
+        .promise()
+        .then((data) => {
+            response.body = JSON.stringify(data.Items);
             resolve(response);
+        }).catch((err) => {
+            response.statusCode = err.statusCode || 503;
+            response.body = JSON.stringify(err.message);
+            resolve(response)
         })
     });
 };
